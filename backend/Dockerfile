@@ -12,6 +12,4 @@ COPY . /proj/backend/
 
 RUN poetry install
 
-
-# CMD ["poetry", "run", "uvicorn", "src.presentation.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 CMD ["python", "-m", "src.presentation.api.main"]
