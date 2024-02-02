@@ -9,7 +9,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - db:/var/lib/postgresql/data
+      - ./data/postgres:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'" ]
       interval: 10s
@@ -20,12 +20,11 @@ services:
   backend:
     build:
       context: backend
+      target: dev
     ports:
       - '8000:8000'
     env_file:
       - .env
-    volumes:
-      - .:/proj/
     restart: always
     depends_on:
       db:
@@ -46,4 +45,4 @@ services:
 
 
 volumes:
-  db:
+  database:
