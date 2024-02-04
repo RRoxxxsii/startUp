@@ -7,6 +7,7 @@
 2. `make build-up-docker-dev` (билд образа и запуск контейнеров)
 
 <h4>Билд образа и запуск локального сервера с окружением для продакшна:</h4>
+
 1. `make create-dev-envs` 
 2. `make build-up-docker-prod` 
 
