@@ -1,0 +1,5 @@
+POSTGRES_DB=dbStartup
+POSTGRES_USER=dbUser
+POSTGRES_PASSWORD=dbPass
+
+PG_DSN=postgresql+asyncpg://dbUser:dbPass@db:5432/dbStartup
