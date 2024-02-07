@@ -6,10 +6,11 @@ import pytest_asyncio
 from fastapi import FastAPI
 from httpx import AsyncClient
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import sessionmaker, close_all_sessions
-
-from src.infrastructure.database.config import create_engine, get_async_session_maker
+from sqlalchemy.orm import close_all_sessions, sessionmaker
+from src.infrastructure.database.config import (
+    create_engine,
+    get_async_session_maker,
+)
 from src.infrastructure.settings import get_settings
 from src.presentation.api.controllers import setup_controllers
 from src.presentation.api.di import setup_uow
@@ -24,7 +25,7 @@ def create_test_app() -> FastAPI:
     db_engine = create_engine(settings.PG_DSN)
 
     setup_uow(app, get_async_session_maker(db_engine))
-    setup_controllers(app.router)   # noqa
+    setup_controllers(app.router)  # noqa
     return app
 
 
@@ -36,7 +37,7 @@ async def db_session_test() -> sessionmaker:
 
 @pytest_asyncio.fixture(scope="function", autouse=True)
 async def clean_tables(db_session_test) -> None:
-    tables = ("users", )
+    tables = ("users",)
     async with db_session_test() as session:
         for table in tables:
             stmt = text(f"""TRUNCATE TABLE {table} CASCADE;""")
@@ -46,7 +47,9 @@ async def clean_tables(db_session_test) -> None:
 
 @pytest_asyncio.fixture(scope="function")
 async def api_client() -> AsyncGenerator[AsyncClient, Any]:
-    async with AsyncClient(app=create_test_app(), base_url="http://test") as client:
+    async with AsyncClient(
+        app=create_test_app(), base_url="http://test"
+    ) as client:
         yield client
 
 

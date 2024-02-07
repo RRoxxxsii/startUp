@@ -5,7 +5,9 @@ create_user = {
         "description": "Unique constraint failed (e.g. password)",
         "content": {
             "application/json": {
-                "example": {"detail": "Пользователь с такими данными уже существует"}
+                "example": {
+                    "detail": "Пользователь с такими данными уже существует"
+                }
             }
         },
     },

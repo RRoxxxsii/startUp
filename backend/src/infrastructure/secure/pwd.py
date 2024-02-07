@@ -2,12 +2,10 @@ from abc import ABC, abstractmethod
 
 from passlib.context import CryptContext
 
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class AbstractPasswordHandler(ABC):
-
     @abstractmethod
     def check_password(self, password: str, hashed_password: str) -> bool:
         raise NotImplementedError
@@ -18,7 +16,6 @@ class AbstractPasswordHandler(ABC):
 
 
 class PasslibPasswordHandler(AbstractPasswordHandler):
-
     def check_password(self, password: str, hashed_password: str) -> bool:
         return pwd_context.verify(password, hashed_password)
 

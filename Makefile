@@ -1,3 +1,5 @@
+CONFIG_DEV_LINT_PATH='./backend/.pre-commit.config.yaml'
+
 # Create file with environment variables
 create-envs:
 	cat .envExample > .env
@@ -30,3 +32,7 @@ build-docker-prod:
 # Run all tests
 test:
 	pytest -v -s
+
+# Lint
+lint:
+	cd ./backend && pre-commit run --all-files

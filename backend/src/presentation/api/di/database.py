@@ -1,10 +1,8 @@
-from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
-
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from src.infrastructure.database.uow import UnitOfWork
 
 
 class DBProvider:
-
     def __init__(self, pool: async_sessionmaker[AsyncSession]):
         self.pool = pool
 

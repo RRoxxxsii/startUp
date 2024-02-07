@@ -1,16 +1,18 @@
 from sqlalchemy import NullPool
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker, AsyncEngine
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 
 def create_engine(database_url: str) -> AsyncEngine:
-    return create_async_engine(
-        database_url,    # noqa
-        poolclass=NullPool
-    )
+    return create_async_engine(database_url, poolclass=NullPool)  # noqa
 
 
 def get_async_session_maker(
-        engine: AsyncEngine
+    engine: AsyncEngine,
 ) -> async_sessionmaker[AsyncSession]:
     return async_sessionmaker(
         engine,

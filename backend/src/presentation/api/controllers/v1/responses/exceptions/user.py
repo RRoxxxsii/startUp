@@ -1,6 +1,7 @@
 from pydantic import Field
-
-from src.presentation.api.controllers.v1.responses.exceptions.base import ApiError
+from src.presentation.api.controllers.v1.responses.exceptions.base import (
+    ApiError,
+)
 
 
 class UserExistsResponse(ApiError):

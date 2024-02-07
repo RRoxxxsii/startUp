@@ -1,7 +1,7 @@
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 
 from src.infrastructure.database.models import UserORM
-from src.infrastructure.database.repositories.base import AbstractRepository, BaseRepository
+from src.infrastructure.database.repositories.base import AbstractRepository
 
 
 class AbstractUserRepository(AbstractRepository, ABC):

@@ -8,8 +8,8 @@
 
 <h4>Билд образа и запуск локального сервера с окружением для продакшна:</h4>
 
-1. `make create-dev-envs` 
-2. `make build-up-docker-prod` 
+1. `make create-dev-envs`
+2. `make build-up-docker-prod`
 
 <h2>Запуск проекта без утилиты Make: </h2>
 <h4>Запуск девелопмент сервера без утилиты Make: </h4>
@@ -19,7 +19,7 @@
 
 <h4> Запуск продакшн сервера без утилиты Make: </h4>
 
-1. `cat .envExample > .env` 
+1. `cat .envExample > .env`
 2. `docker compose -f docker-compose.prod.yaml up --build`
 
 *Создание файла с переменными окружения, очевидно, выполняется один раз*  <br>

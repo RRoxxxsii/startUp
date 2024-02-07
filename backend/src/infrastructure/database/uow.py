@@ -1,5 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.infrastructure.database.repositories import UserRepository, AbstractUserRepository
+from src.infrastructure.database.repositories import (
+    AbstractUserRepository,
+    UserRepository,
+)
 
 
 class SqlAlchemyUOW:
@@ -24,10 +27,7 @@ class UnitOfWork(SqlAlchemyUOW):
         self.app_holder = AppHolder(session)
 
 
-class StubUnitOfWork:
-    def __init__(self, session: AsyncSession) -> None:
-        self.app_holder = AppHolder(session)
-
+class StubUnitOfWork(UnitOfWork):
     async def commit(self):
         pass
 

@@ -1,19 +1,15 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar
 
-from sqlalchemy import select, update, delete
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from src.infrastructure.database.models.base import AbstractModel
-
-Model = TypeVar("Model", bound=AbstractModel)
 
 
 class AbstractRepository(ABC):
-    _model: type[Model] = None
+    _model: type[AbstractModel]
 
     @abstractmethod
-    def __init__(self, session: AsyncSession):   # noqa
+    def __init__(self, session: AsyncSession):  # noqa
         raise NotImplementedError
 
     @abstractmethod
@@ -38,7 +34,7 @@ class AbstractRepository(ABC):
 
 
 class BaseRepository(AbstractRepository):
-    _model: type[Model] = None
+    _model: type[AbstractModel]
 
     def __init__(self, session: AsyncSession):
         self._session = session
