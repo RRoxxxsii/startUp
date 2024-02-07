@@ -1,5 +1,5 @@
-# Create file with environment variables for development
-create-dev-envs:
+# Create file with environment variables
+create-envs:
 	cat .envExample > .env
 
 # Build docker images and run for development

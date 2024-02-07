@@ -1,11 +1,11 @@
 import os
+from dataclasses import dataclass
 from functools import lru_cache
 
-from pydantic_settings import BaseSettings
 
-
-class Settings(BaseSettings):
-    PG_DSN: str = os.getenv('PG_DSN')
+@dataclass
+class Settings:
+    PG_DSN: str = os.getenv("PG_DSN")
 
 
 @lru_cache

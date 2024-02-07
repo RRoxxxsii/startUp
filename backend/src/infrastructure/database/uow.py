@@ -1,4 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from src.infrastructure.database.repositories import UserRepository, AbstractUserRepository
 
 
 class SqlAlchemyUOW:
@@ -14,10 +15,21 @@ class SqlAlchemyUOW:
 
 class AppHolder:
     def __init__(self, session: AsyncSession) -> None:
-        ...
+        self.user_repo: AbstractUserRepository = UserRepository(session)
 
 
 class UnitOfWork(SqlAlchemyUOW):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session)
-        self.blog_holder = AppHolder(session)
+        self.app_holder = AppHolder(session)
+
+
+class StubUnitOfWork:
+    def __init__(self, session: AsyncSession) -> None:
+        self.app_holder = AppHolder(session)
+
+    async def commit(self):
+        pass
+
+    async def rollback(self):
+        pass

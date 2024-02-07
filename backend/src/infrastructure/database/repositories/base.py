@@ -13,7 +13,7 @@ class AbstractRepository(ABC):
     _model: type[Model] = None
 
     @abstractmethod
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession):   # noqa
         raise NotImplementedError
 
     @abstractmethod

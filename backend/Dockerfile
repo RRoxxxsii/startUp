@@ -17,7 +17,7 @@ ENV PROD 1
 
 RUN poetry install --without dev
 
-CMD ["python", "-m", "src.presentation.api.main"]
+CMD ["python", "-m", "src.presentation.api.main", "&", "alembic", "upgrade", "head"]
 
 
 FROM build_app as dev
@@ -26,4 +26,4 @@ ENV DEV 1
 
 RUN poetry install --with dev
 
-CMD ["python", "-m", "src.presentation.api.main"]
+CMD ["python", "-m", "src.presentation.api.main", "&", "alembic", "upgrade", "head"]
