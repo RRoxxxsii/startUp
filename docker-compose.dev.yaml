@@ -30,6 +30,24 @@ services:
       db:
         condition: service_healthy
 
+  # Redis
+  redis:
+    image: redis:7.0.5-alpine
+    container_name: redis
+
+  # Celery Worker
+  celery:
+    build:
+      context: backend
+    command: celery -A src.infrastructure.tasks.tasks worker --loglevel=info
+    volumes:
+      - .:/proj
+    env_file:
+      - .env
+    depends_on:
+      - backend
+      - redis
+
   # FrontEnd
   frontend:
     build:

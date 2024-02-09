@@ -1,8 +1,11 @@
 CONFIG_DEV_LINT_PATH='./backend/.pre-commit.config.yaml'
 
 # Create file with environment variables
-create-envs:
-	cat .envExample > .env
+create-envs-dev:
+	cat envs/.envExampleDev > .env
+
+create-envs-prod:
+	cat envs/.envExampleProd > .env
 
 # Build docker images and run for development
 build-up-docker-dev:

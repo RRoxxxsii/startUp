@@ -1,26 +1,36 @@
-
 <hr>
 <h2>Запуск проекта с утилитой Make: </h2>
 <h4>Билд образа и запуск локального сервера с окружением для разработки:</h4>
 
-1. `make create-dev-envs` (создание файла с переменными окружения)
+1. `make create-envs-dev` (создание файла с переменными окружения)
 2. `make build-up-docker-dev` (билд образа и запуск контейнеров)
 
 <h4>Билд образа и запуск локального сервера с окружением для продакшна:</h4>
+<p>При запуске сервера для production, необходимо добавить в файл с переменными окружения следующие переменные:</p>
 
-1. `make create-dev-envs`
+`MAIL_USERNAME=yourmail@yandex.ru` <br>
+`MAIL_PASSWORD=yoursecretpassword` <br>
+`MAIL_FROM=yourmailfrom@yandex.com` <br>
+
+<p>Для получения данных из переменных окружения, необходимо зарегистрировать аккаунт в сервисе Яндекса</p>
+
+1. `make create-envs-prod`
 2. `make build-up-docker-prod`
 
 <h2>Запуск проекта без утилиты Make: </h2>
 <h4>Запуск девелопмент сервера без утилиты Make: </h4>
 
-1. `cat .envExample > .env` (создание файла с окружением)
+1. `cat envs/.envExampleDev > .env` (создание файла с окружением)
 2. `docker compose -f docker-compose.dev.yaml up --build`
 
 <h4> Запуск продакшн сервера без утилиты Make: </h4>
 
-1. `cat .envExample > .env`
+1. `cat envs/.envExampleProd > .env`
 2. `docker compose -f docker-compose.prod.yaml up --build`
+
+<p>
+Для продакшн также необходимо добавить в файл переменные окружения для SMTP-сервера (смотри выше в запуск утилитой Make)
+</p>
 
 *Создание файла с переменными окружения, очевидно, выполняется один раз*  <br>
 *Более подробно инструкции утилиты Make вы можете посмотреть в Makefile в корне проекта*

@@ -43,6 +43,24 @@ services:
       backend:
         condition: service_started
 
+  # Redis
+  redis:
+    image: redis:7.0.5-alpine
+    container_name: redis
+
+  # Celery Worker
+  celery:
+    build:
+      context: backend
+    command: celery -A src.infrastructure.tasks.tasks worker --loglevel=info
+    volumes:
+      - .:/proj
+    env_file:
+      - .env
+    depends_on:
+      - backend
+      - redis
+
 
 volumes:
   db:
