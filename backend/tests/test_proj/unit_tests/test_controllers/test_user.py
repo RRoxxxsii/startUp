@@ -36,7 +36,7 @@ class TestCreateUser:
         mocker: MockFixture,
     ):
         mocker.patch(
-            "src.domain.app.usecases.user.usecases.CreateUser.__call__",
+            "src.domain.app.usecases.user.usecases.CreateUser.execute",
             side_effect=UserExists,
         )  # Mock Exception raise for unique constraint violated
 

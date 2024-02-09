@@ -9,7 +9,7 @@ from starlette import status
 
 class TestCreateUser:
     async def test_create_user_ok(
-        self, api_client: AsyncClient, user_in_data_unique: dict
+        self, api_client: AsyncClient, user_in_data_unique: dict, outbox
     ):
         response = await api_client.post(
             "/user/create/", json=user_in_data_unique
@@ -23,9 +23,14 @@ class TestCreateUser:
         )
         assert resp_data.get("lastname") == user_in_data_unique.get("lastname")
         assert response.status_code == status.HTTP_201_CREATED
+        assert len(outbox) == 1
 
     async def test_create_user_failed_not_unique(
-        self, api_client: AsyncClient, user_in_data_common: dict, create_user
+        self,
+        api_client: AsyncClient,
+        user_in_data_common: dict,
+        create_user,
+        outbox,
     ):
         await create_user(**user_in_data_common)
 
@@ -36,3 +41,4 @@ class TestCreateUser:
 
         assert resp_data == UserExistsResponse().model_dump()
         assert response.status_code == status.HTTP_409_CONFLICT
+        assert len(outbox) == 0

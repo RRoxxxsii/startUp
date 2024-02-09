@@ -2,6 +2,7 @@ import pytest
 from passlib.context import CryptContext
 from sqlalchemy.orm import sessionmaker
 from src.infrastructure.database.models import UserORM
+from src.infrastructure.mailing.utils import get_mediator
 from tests.conftest import fake
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -51,3 +52,11 @@ async def create_user(db_session_test: sessionmaker):
             return user_
 
     return wrapper
+
+
+@pytest.fixture
+def outbox() -> list:
+    mediator = get_mediator()
+    if mediator.get_outbox():
+        mediator.clear_outbox()
+    return mediator.get_outbox()
