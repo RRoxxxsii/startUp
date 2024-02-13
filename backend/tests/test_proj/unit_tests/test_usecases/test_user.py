@@ -1,3 +1,6 @@
+import datetime
+import uuid
+
 import pytest
 from pytest_mock import MockFixture
 from src.domain.app.dto.user import CreateUserDTO
@@ -7,6 +10,7 @@ from src.domain.common.dto.url import UrlPathDTO
 from src.infrastructure.database.uow import StubUnitOfWork
 from src.infrastructure.mailing.services import DebugEmailService
 from src.infrastructure.secure.services import PasslibPasswordService
+from tests.conftest import fake
 from tests.test_proj.unit_tests.conftest import FakeEmailSettings
 
 
@@ -16,16 +20,29 @@ class TestCreateUser:
         user_in_data_unique: dict,
         mocker: MockFixture,
         create_mock_user,
+        create_mock_token,
         outbox,
     ):
-        user_fixture = create_mock_user(**user_in_data_unique)
-
+        user_fixture = create_mock_user(
+            fake.unique.random_int(), **user_in_data_unique
+        )
+        token_fixture = create_mock_token(
+            fake.unique.random_int(),
+            str(uuid.uuid4()),
+            datetime.datetime.now(),
+        )
         mocker.patch(
-            "src.infrastructure.database.repositories.user.implementation.UserRepository.get_user_by_email"  # noqa
+            "src.infrastructure.database.repositories.user."
+            "implementation.UserRepository.get_user_by_email"  # noqa
         ).return_value = None
         mocker.patch(
-            "src.infrastructure.database.repositories.user.implementation.UserRepository.get_user_by_username"  # noqa
+            "src.infrastructure.database.repositories.user."
+            "implementation.UserRepository.get_user_by_username"  # noqa
         ).return_value = None
+        mocker.patch(
+            "src.infrastructure.database.repositories.token."
+            "implementation.TokenRepository.create"
+        ).return_value = token_fixture
         mocker.patch(
             "src.infrastructure.database.repositories.base.BaseRepository.create"  # noqa
         ).return_value = user_fixture
@@ -48,15 +65,28 @@ class TestCreateUser:
         user_in_data_unique: dict,
         mocker: MockFixture,
         create_mock_user,
+        create_mock_token,
         outbox,
     ):
-        user_fixture = create_mock_user(**user_in_data_unique)
-
+        user_fixture = create_mock_user(
+            fake.unique.random_int(), **user_in_data_unique
+        )
+        token_fixture = create_mock_token(
+            fake.unique.random_int(),
+            str(uuid.uuid4()),
+            datetime.datetime.now(),
+        )
         mocker.patch(
-            "src.infrastructure.database.repositories.user.implementation.UserRepository.get_user_by_email"  # noqa
+            "src.infrastructure.database.repositories.user."
+            "implementation.UserRepository.get_user_by_email"  # noqa
         ).return_value = user_fixture
         mocker.patch(
-            "src.infrastructure.database.repositories.user.implementation.UserRepository.get_user_by_username"  # noqa
+            "src.infrastructure.database.repositories.token."
+            "implementation.TokenRepository.create"
+        ).return_value = token_fixture
+        mocker.patch(
+            "src.infrastructure.database.repositories.user."
+            "implementation.UserRepository.get_user_by_username"  # noqa
         ).return_value = None
 
         uow = StubUnitOfWork(...)
@@ -78,12 +108,16 @@ class TestCreateUser:
         create_mock_user,
         outbox,
     ):
-        user_fixture = create_mock_user(**user_in_data_unique)
+        user_fixture = create_mock_user(
+            fake.unique.random_int(), **user_in_data_unique
+        )
         mocker.patch(
-            "src.infrastructure.database.repositories.user.implementation.UserRepository.get_user_by_email"  # noqa
+            "src.infrastructure.database.repositories.user."
+            "implementation.UserRepository.get_user_by_email"  # noqa
         ).return_value = None
         mocker.patch(
-            "src.infrastructure.database.repositories.user.implementation.UserRepository.get_user_by_username"  # noqa
+            "src.infrastructure.database.repositories.user."
+            "implementation.UserRepository.get_user_by_username"  # noqa
         ).return_value = user_fixture
 
         uow = StubUnitOfWork(...)

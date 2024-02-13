@@ -1,11 +1,10 @@
+import ast
 import smtplib
 import ssl
-import ast
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-
 from src.infrastructure.mailing.config import EmailSettings
 from src.infrastructure.tasks.config import app
 
@@ -14,10 +13,10 @@ from src.infrastructure.tasks.config import app
 def render_template(email_dto: dict) -> str:
     env = Environment(
         loader=FileSystemLoader(EmailSettings.EMAIL_TEMPLATES),
-        autoescape=select_autoescape()
+        autoescape=select_autoescape(),
     )
 
-    template = env.get_template(email_dto.get('template_name'))
+    template = env.get_template(email_dto.get("template_name"))
     message = template.render(ast.literal_eval(email_dto.get("extra")))
     return message
 
@@ -25,8 +24,8 @@ def render_template(email_dto: dict) -> str:
 @app.task
 def send(rendered_message: str, email_dto: dict) -> None:
     message = MIMEMultipart("alternative")
-    message["Subject"] = email_dto.get('subject')
-    message["To"] = email_dto.get('to_email')
+    message["Subject"] = email_dto.get("subject")
+    message["To"] = email_dto.get("to_email")
     message["From"] = EmailSettings.MAIL_FROM
 
     part = MIMEText(rendered_message, "html")
@@ -36,4 +35,8 @@ def send(rendered_message: str, email_dto: dict) -> None:
     with smtplib.SMTP_SSL("smtp.yandex.com", 465, context=context) as server:
         server.set_debuglevel(1)
         server.login(EmailSettings.MAIL_USERNAME, EmailSettings.MAIL_PASSWORD)
-        server.sendmail(EmailSettings.MAIL_FROM, email_dto.get('to_email'), message.as_string())  # noqa
+        server.sendmail(
+            EmailSettings.MAIL_FROM,
+            email_dto.get("to_email"),
+            message.as_string(),
+        )  # noqa

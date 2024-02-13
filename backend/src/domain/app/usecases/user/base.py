@@ -4,7 +4,7 @@ from src.infrastructure.mailing.services import AbstractEmailService
 from src.infrastructure.secure.services import AbstractPasswordService
 
 
-class UserUseCase(BaseUseCase):
+class CreateUserUseCase(BaseUseCase):
     def __init__(
         self,
         uow: UnitOfWork,

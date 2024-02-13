@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserOutSchema(BaseModel):
@@ -11,3 +11,7 @@ class UserOutSchema(BaseModel):
     firstname: str
     is_active: bool = False
     time_created: datetime
+
+
+class EmailConfirmed(BaseModel):
+    detail: str = Field("Почтовый адрес успешно подтвержден")

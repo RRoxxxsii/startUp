@@ -1,5 +1,5 @@
 import os
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 
 
 @dataclass(frozen=True)
@@ -11,10 +11,10 @@ class EmailSettings:
     EMAIL_TEMPLATES = os.path.join(
         os.path.abspath(
             os.path.join(
-                os.path.dirname(os.path.abspath(__file__)), '../../..'
+                os.path.dirname(os.path.abspath(__file__)), "../../.."
             )
         ),
-        "templates/emails/"
+        "templates/emails/",
     )
 
     def dict(self):

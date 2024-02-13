@@ -3,6 +3,7 @@ class OutBox:
     Provides list of email messages sent
     The class is used for testing purposes
     """
+
     outbox: list = []
 
 
@@ -12,6 +13,7 @@ class Mediator:
     messages and class that implements mail-sending interface
     for test purposes
     """
+
     def __init__(self):
         self._outbox = OutBox.outbox
 

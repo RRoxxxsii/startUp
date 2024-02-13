@@ -1,5 +1,5 @@
-from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.infrastructure.database.models.base import AbstractModel, time_created
 
 
@@ -18,8 +18,19 @@ class UserORM(AbstractModel):
 
     hashed_password: Mapped[str] = mapped_column(String(125))
     is_active: Mapped[bool] = mapped_column(default=False)
-
     time_created: Mapped[time_created]
+
+    tokens: Mapped[list["TokenORM"]] = relationship(back_populates="user")
 
     def __repr__(self) -> str:
         return self.username
+
+
+class TokenORM(AbstractModel):
+    __tablename__ = "tokens"
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user: Mapped["UserORM"] = relationship(back_populates="tokens")
+
+    access_token: Mapped[str] = mapped_column(unique=True, index=True)
+    time_created: Mapped[time_created]

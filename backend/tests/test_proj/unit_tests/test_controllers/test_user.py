@@ -7,6 +7,7 @@ from src.presentation.api.controllers.v1.responses.exceptions.user import (
     UserExistsResponse,
 )
 from starlette import status
+from tests.conftest import fake
 
 
 class TestCreateUser:
@@ -17,7 +18,9 @@ class TestCreateUser:
         mocker: MockFixture,
         create_mock_user,
     ):
-        user = create_mock_user(**user_in_data_unique)
+        user = create_mock_user(
+            fake.unique.random_int(), **user_in_data_unique
+        )
 
         mocker.patch(
             "src.domain.app.usecases.user.usecases.UserInteractor.create_user",

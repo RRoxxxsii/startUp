@@ -1,5 +1,8 @@
 from src.infrastructure.mailing.config import EmailSettings
-from src.infrastructure.mailing.services import SMTPLibEmailService, DebugEmailService
+from src.infrastructure.mailing.services import (
+    DebugEmailService,
+    SMTPLibEmailService,
+)
 
 
 class MailingProvider:

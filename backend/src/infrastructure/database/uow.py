@@ -1,6 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.infrastructure.database.repositories import (
+    AbstractTokenRepository,
     AbstractUserRepository,
+    TokenRepository,
     UserRepository,
 )
 
@@ -19,6 +21,7 @@ class SqlAlchemyUOW:
 class AppHolder:
     def __init__(self, session: AsyncSession) -> None:
         self.user_repo: AbstractUserRepository = UserRepository(session)
+        self.token_repo: AbstractTokenRepository = TokenRepository(session)
 
 
 class UnitOfWork(SqlAlchemyUOW):
