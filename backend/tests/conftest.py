@@ -1,3 +1,4 @@
+import os
 from collections.abc import AsyncGenerator
 from typing import Any
 
@@ -11,10 +12,15 @@ from src.infrastructure.database.config import (
     create_engine,
     get_async_session_maker,
 )
+from src.infrastructure.inmemory.config import init_redis_pool
 from src.infrastructure.mailing.config import EmailSettings
 from src.infrastructure.settings import get_settings
 from src.presentation.api.controllers import setup_controllers
-from src.presentation.api.di import setup_mailing, setup_uow
+from src.presentation.api.di import (
+    setup_in_memory_db,
+    setup_mailing,
+    setup_uow,
+)
 
 
 def create_test_app() -> FastAPI:
@@ -28,6 +34,10 @@ def create_test_app() -> FastAPI:
     setup_uow(app, get_async_session_maker(db_engine))
     setup_mailing(app, settings=EmailSettings(), prod=False)
     setup_controllers(app.router)  # noqa
+
+    pool = init_redis_pool(host=os.getenv("REDIS_HOST"))
+    setup_in_memory_db(app, pool)
+
     return app
 
 

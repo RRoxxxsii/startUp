@@ -7,3 +7,11 @@ class UserExists(DomainException):
 
 class TokenDoesNotExist(DomainException):
     pass
+
+
+class PasswordDoesNotMatch(DomainException):
+    pass
+
+
+class UserDoesNotExist(DomainException):
+    pass

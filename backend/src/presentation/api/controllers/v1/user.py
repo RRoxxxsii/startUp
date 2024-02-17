@@ -1,18 +1,35 @@
 from fastapi import APIRouter, Depends, Response
-from src.domain.app.dto.user import CreateUserDTO
-from src.domain.app.exceptions.user import TokenDoesNotExist, UserExists
+from src.domain.app.dto.user import AuthDTO, CreateUserDTO
+from src.domain.app.exceptions.user import (
+    PasswordDoesNotMatch,
+    TokenDoesNotExist,
+    UserDoesNotExist,
+    UserExists,
+)
 from src.domain.app.usecases.user.usecases import UserInteractor
 from src.domain.common.dto.url import UrlPathDTO
 from src.presentation.api.controllers.v1.docs.user import (
+    authenticate as authenticate_docs,
+)
+from src.presentation.api.controllers.v1.docs.user import (
+    confirm_email as confirm_email_docs,
+)
+from src.presentation.api.controllers.v1.docs.user import (
     create_user as create_user_docs,
 )
-from src.presentation.api.controllers.v1.requests.user import UserInSchema
+from src.presentation.api.controllers.v1.requests.user import (
+    AuthInSchema,
+    UserInSchema,
+)
 from src.presentation.api.controllers.v1.responses.exceptions.user import (
+    PasswordDoesNotMatchResponse,
     TokenDoesNotExistResponse,
+    UserDoesNotExistResponse,
     UserExistsResponse,
 )
 from src.presentation.api.controllers.v1.responses.user import (
-    EmailConfirmed,
+    EmailConfirmedResponse,
+    TokenCreatedResponse,
     UserOutSchema,
 )
 from src.presentation.api.di.services import get_user_services
@@ -52,7 +69,8 @@ async def create_user(
 @router.get(
     "/create/{token}",
     status_code=status.HTTP_200_OK,
-    response_model=TokenDoesNotExistResponse | EmailConfirmed,
+    response_model=TokenDoesNotExistResponse | EmailConfirmedResponse,
+    responses=confirm_email_docs,
 )
 async def confirm_email(
     token: str,
@@ -66,4 +84,30 @@ async def confirm_email(
         return TokenDoesNotExistResponse()
     else:
         response.status_code = status.HTTP_200_OK
-        return EmailConfirmed()
+        return EmailConfirmedResponse()
+
+
+@router.post(
+    "/auth/",
+    status_code=status.HTTP_200_OK,
+    response_model=UserDoesNotExistResponse
+    | PasswordDoesNotMatchResponse
+    | TokenCreatedResponse,
+    responses=authenticate_docs,
+)
+async def authenticate(
+    auth_schema: AuthInSchema,
+    response: Response,
+    service: UserInteractor = Depends(get_user_services),
+):
+    dto = AuthDTO(**auth_schema.model_dump())
+    try:
+        token = await service.auth_user(dto)
+    except UserDoesNotExist:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return UserDoesNotExistResponse()
+    except PasswordDoesNotMatch:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return PasswordDoesNotMatchResponse()
+    else:
+        return TokenCreatedResponse(detail=token)

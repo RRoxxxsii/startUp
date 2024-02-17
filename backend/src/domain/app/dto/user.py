@@ -11,3 +11,9 @@ class CreateUserDTO:
 
     def dict(self):
         return {k: str(v) for k, v in asdict(self).items()}
+
+
+@dataclass(frozen=True)
+class AuthDTO:
+    password: str
+    email: str

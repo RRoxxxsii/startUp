@@ -3,15 +3,14 @@ import uuid
 
 import pytest
 from pytest_mock import MockFixture
-from src.domain.app.dto.user import CreateUserDTO
-from src.domain.app.exceptions.user import UserExists
-from src.domain.app.usecases.user.usecases import UserInteractor
+from src.domain.app.dto.user import AuthDTO, CreateUserDTO
+from src.domain.app.exceptions.user import (
+    PasswordDoesNotMatch,
+    UserDoesNotExist,
+    UserExists,
+)
 from src.domain.common.dto.url import UrlPathDTO
-from src.infrastructure.database.uow import StubUnitOfWork
-from src.infrastructure.mailing.services import DebugEmailService
-from src.infrastructure.secure.services import PasslibPasswordService
 from tests.conftest import fake
-from tests.test_proj.unit_tests.conftest import FakeEmailSettings
 
 
 class TestCreateUser:
@@ -22,6 +21,7 @@ class TestCreateUser:
         create_mock_user,
         create_mock_token,
         outbox,
+        user_interactor,
     ):
         user_fixture = create_mock_user(
             fake.unique.random_int(), **user_in_data_unique
@@ -33,26 +33,21 @@ class TestCreateUser:
         )
         mocker.patch(
             "src.infrastructure.database.repositories.user."
-            "implementation.UserRepository.get_user_by_email"  # noqa
+            "UserRepository.get_user_by_email"  # noqa
         ).return_value = None
         mocker.patch(
             "src.infrastructure.database.repositories.user."
-            "implementation.UserRepository.get_user_by_username"  # noqa
+            "UserRepository.get_user_by_username"  # noqa
         ).return_value = None
         mocker.patch(
             "src.infrastructure.database.repositories.token."
-            "implementation.TokenRepository.create"
+            "TokenRepository.create"
         ).return_value = token_fixture
         mocker.patch(
             "src.infrastructure.database.repositories.base.BaseRepository.create"  # noqa
         ).return_value = user_fixture
 
-        uow = StubUnitOfWork(...)
-        email_service = DebugEmailService(FakeEmailSettings())
-
-        user = await UserInteractor(
-            uow, PasslibPasswordService(), email_service
-        ).create_user(
+        user = await user_interactor.create_user(
             CreateUserDTO(**user_in_data_unique),
             UrlPathDTO(domain="http://test"),
         )
@@ -67,6 +62,7 @@ class TestCreateUser:
         create_mock_user,
         create_mock_token,
         outbox,
+        user_interactor,
     ):
         user_fixture = create_mock_user(
             fake.unique.random_int(), **user_in_data_unique
@@ -78,24 +74,19 @@ class TestCreateUser:
         )
         mocker.patch(
             "src.infrastructure.database.repositories.user."
-            "implementation.UserRepository.get_user_by_email"  # noqa
+            "UserRepository.get_user_by_email"  # noqa
         ).return_value = user_fixture
         mocker.patch(
             "src.infrastructure.database.repositories.token."
-            "implementation.TokenRepository.create"
+            "TokenRepository.create"
         ).return_value = token_fixture
         mocker.patch(
             "src.infrastructure.database.repositories.user."
-            "implementation.UserRepository.get_user_by_username"  # noqa
+            "UserRepository.get_user_by_username"  # noqa
         ).return_value = None
 
-        uow = StubUnitOfWork(...)
-        email_service = DebugEmailService(FakeEmailSettings())
-
         with pytest.raises(UserExists):
-            await UserInteractor(
-                uow, PasslibPasswordService(), email_service
-            ).create_user(
+            await user_interactor.create_user(
                 CreateUserDTO(**user_in_data_unique),
                 UrlPathDTO(domain="http://test/"),
             )
@@ -107,27 +98,93 @@ class TestCreateUser:
         mocker: MockFixture,
         create_mock_user,
         outbox,
+        user_interactor,
     ):
         user_fixture = create_mock_user(
             fake.unique.random_int(), **user_in_data_unique
         )
         mocker.patch(
             "src.infrastructure.database.repositories.user."
-            "implementation.UserRepository.get_user_by_email"  # noqa
+            "UserRepository.get_user_by_email"  # noqa
         ).return_value = None
         mocker.patch(
             "src.infrastructure.database.repositories.user."
-            "implementation.UserRepository.get_user_by_username"  # noqa
+            "UserRepository.get_user_by_username"  # noqa
         ).return_value = user_fixture
 
-        uow = StubUnitOfWork(...)
-        email_service = DebugEmailService(FakeEmailSettings())
-
         with pytest.raises(UserExists):
-            await UserInteractor(
-                uow, PasslibPasswordService(), email_service
-            ).create_user(
+            await user_interactor.create_user(
                 CreateUserDTO(**user_in_data_unique),
                 UrlPathDTO(domain="http://test"),
             )
         assert len(outbox) == 0
+
+
+class TestAuthenticate:
+    async def test_authenticate_ok(
+        self,
+        user_in_data_unique: dict,
+        create_user,
+        user_interactor,
+        mocker: MockFixture,
+    ):
+        user = await create_user(**user_in_data_unique)
+        dto = AuthDTO(
+            password=user_in_data_unique.get("password"), email=user.email
+        )
+
+        mocker.patch(
+            "src.infrastructure.database.repositories.user."
+            "UserRepository.get_user_by_email"  # noqa
+        ).return_value = user
+
+        mocker.patch(
+            "src.infrastructure.secure.services.PasslibPasswordService."
+            "check_password"  # noqa
+        ).return_value = True
+
+        res = await user_interactor.auth_user(dto=dto)
+        assert res
+
+    async def test_authenticate_user_doesnt_exist(
+        self,
+        user_in_data_unique: dict,
+        create_user,
+        mocker: MockFixture,
+        user_interactor,
+    ):
+        user = await create_user(**user_in_data_unique)
+        dto = AuthDTO(
+            password=user_in_data_unique.get("password"), email=user.email
+        )
+
+        mocker.patch(
+            "src.infrastructure.database.repositories.user."
+            "UserRepository.get_user_by_email"  # noqa
+        ).return_value = None
+
+        with pytest.raises(UserDoesNotExist):
+            await user_interactor.auth_user(dto=dto)
+
+    async def test_authenticate_password_doesnt_match(
+        self,
+        user_in_data_unique: dict,
+        create_user,
+        user_interactor,
+        mocker: MockFixture,
+    ):
+        user = await create_user(**user_in_data_unique)
+        dto = AuthDTO(password="RandomPasswordString123", email=user.email)
+
+        mocker.patch(
+            "src.infrastructure.database.repositories.user."
+            "UserRepository.get_user_by_email"  # noqa
+        ).return_value = user
+
+        mocker.patch(
+            "src.infrastructure.secure.services.PasslibPasswordService."
+            "check_password"  # noqa
+        ).return_value = False
+
+        with pytest.raises(PasswordDoesNotMatch):
+            await user_interactor.auth_user(dto=dto)

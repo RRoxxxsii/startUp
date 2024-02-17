@@ -6,10 +6,15 @@ from src.infrastructure.database.config import (
     create_engine,
     get_async_session_maker,
 )
+from src.infrastructure.inmemory.config import init_redis_pool
 from src.infrastructure.mailing.config import EmailSettings
 from src.infrastructure.settings import get_settings
 from src.presentation.api.controllers import setup_controllers
-from src.presentation.api.di import setup_mailing, setup_uow
+from src.presentation.api.di import (
+    setup_in_memory_db,
+    setup_mailing,
+    setup_uow,
+)
 
 
 def create_app() -> FastAPI:
@@ -25,6 +30,10 @@ def create_app() -> FastAPI:
         settings=EmailSettings(),
         prod=True if os.getenv("PROD") else False,
     )
+
+    pool = init_redis_pool(host=os.getenv("REDIS_HOST"))
+    setup_in_memory_db(app, pool)
+
     setup_controllers(router=app.router)  # noqa
     return app
 

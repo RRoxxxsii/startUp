@@ -10,3 +10,11 @@ class UserExistsResponse(ApiError):
 
 class TokenDoesNotExistResponse(ApiError):
     detail: str = Field("Страница не найдена")
+
+
+class UserDoesNotExistResponse(ApiError):
+    detail: str = Field("Пользователь с данной почтой не существует")
+
+
+class PasswordDoesNotMatchResponse(ApiError):
+    detail: str = Field("Пароль некорректен")

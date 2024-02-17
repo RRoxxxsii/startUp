@@ -62,3 +62,44 @@ class TestConfirmEmail:
         response = await api_client.get("/user/create/NotValidToken")
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+class TestAuthenticate:
+    async def test_authenticate_ok(
+        self, api_client: AsyncClient, user_in_data_unique: dict, create_user
+    ):
+        user = await create_user(**user_in_data_unique)
+        response = await api_client.post(
+            "/user/auth/",
+            json={
+                "password": user_in_data_unique.get("password"),
+                "email": user.email,
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+    async def test_authenticate_user_doesnt_exist(
+        self, api_client: AsyncClient, user_in_data_unique: dict, create_user
+    ):
+        await create_user(**user_in_data_unique)
+        response = await api_client.post(
+            "/user/auth/",
+            json={
+                "password": "RandomPasswordString123",
+                "email": "fakeemail@example.com",
+            },
+        )
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    async def test_authenticate_password_doesnt_match(
+        self, api_client: AsyncClient, user_in_data_unique: dict, create_user
+    ):
+        user = await create_user(**user_in_data_unique)
+        response = await api_client.post(
+            "/user/auth/",
+            json={"password": "RandomPasswordString123", "email": user.email},
+        )
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED

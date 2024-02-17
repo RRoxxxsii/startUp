@@ -1,8 +1,10 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.infrastructure.database.repositories import (
+from src.infrastructure.database.repositories.token import (
     AbstractTokenRepository,
-    AbstractUserRepository,
     TokenRepository,
+)
+from src.infrastructure.database.repositories.user import (
+    AbstractUserRepository,
     UserRepository,
 )
 

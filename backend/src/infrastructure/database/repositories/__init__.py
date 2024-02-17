@@ -1,4 +1,2 @@
-from .user.interface import AbstractUserRepository
-from .user.implementation import UserRepository
-from .token.interface import AbstractTokenRepository
-from .token.implementation import TokenRepository
+from .user import AbstractUserRepository, UserRepository
+from .token import AbstractTokenRepository, TokenRepository

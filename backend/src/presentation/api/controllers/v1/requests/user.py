@@ -7,3 +7,8 @@ class UserInSchema(BaseModel):
     email: EmailStr
     surname: str
     firstname: str
+
+
+class AuthInSchema(BaseModel):
+    password: str
+    email: EmailStr

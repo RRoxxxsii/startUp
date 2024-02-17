@@ -13,5 +13,9 @@ class UserOutSchema(BaseModel):
     time_created: datetime
 
 
-class EmailConfirmed(BaseModel):
+class EmailConfirmedResponse(BaseModel):
     detail: str = Field("Почтовый адрес успешно подтвержден")
+
+
+class TokenCreatedResponse(BaseModel):
+    detail: str

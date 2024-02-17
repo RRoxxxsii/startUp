@@ -9,6 +9,7 @@ PG_DSN=postgresql+asyncpg://dbUser:dbPass@db:5432/dbStartup
 CELERY_BROKER_URL=redis://redis:6379/0
 CELERY_RESULT_BACKEND=redis://redis:6379/0
 
+REDIS_HOST=redis
 
 MAIL_USERNAME=yourmail@yandex.ru
 MAIL_PASSWORD=yoursecretpassword
