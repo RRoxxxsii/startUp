@@ -1,3 +1,5 @@
+from abc import abstractmethod
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.infrastructure.database.repositories.token import (
     AbstractTokenRepository,
@@ -9,27 +11,39 @@ from src.infrastructure.database.repositories.user import (
 )
 
 
-class SqlAlchemyUOW:
-    def __init__(self, session: AsyncSession):
-        self.session = session
+class AbstractUnitOfWork:
+    token_repo: AbstractTokenRepository
+    user_repo: AbstractUserRepository
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc_value, traceback):
+        await self.rollback()
+
+    @abstractmethod
+    async def commit(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def rollback(self):
+        raise NotImplementedError()
+
+
+class UnitOfWork(AbstractUnitOfWork):
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def __aenter__(self):
+        self.user_repo = UserRepository(self._session)
+        self.token_repo = TokenRepository(self._session)
+        return super().__aenter__()
 
     async def commit(self):
-        await self.session.commit()
+        await self._session.commit()
 
     async def rollback(self):
-        await self.session.rollback()
-
-
-class AppHolder:
-    def __init__(self, session: AsyncSession) -> None:
-        self.user_repo: AbstractUserRepository = UserRepository(session)
-        self.token_repo: AbstractTokenRepository = TokenRepository(session)
-
-
-class UnitOfWork(SqlAlchemyUOW):
-    def __init__(self, session: AsyncSession) -> None:
-        super().__init__(session)
-        self.app_holder = AppHolder(session)
+        await self._session.rollback()
 
 
 class StubUnitOfWork(UnitOfWork):

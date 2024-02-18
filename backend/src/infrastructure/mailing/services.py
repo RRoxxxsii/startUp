@@ -2,13 +2,13 @@ from abc import ABC, abstractmethod
 
 from celery import chain
 from src.domain.common.dto.mail import EmailDTO
-from src.infrastructure.mailing.config import EmailSettings
+from src.infrastructure.mailing.config import SMTPMailConfig
 from src.infrastructure.mailing.utils import get_mediator
 from src.infrastructure.tasks.tasks import render_template, send
 
 
 class AbstractEmailService(ABC):
-    def __init__(self, settings: EmailSettings) -> None:
+    def __init__(self, settings: SMTPMailConfig) -> None:
         self.settings = settings
 
     @abstractmethod

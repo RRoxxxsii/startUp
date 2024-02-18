@@ -1591,6 +1591,17 @@ anyio = ">=3.4.0,<5"
 full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart (>=0.0.7)", "pyyaml"]
 
 [[package]]
+name = "types-passlib"
+version = "1.7.7.20240106"
+description = "Typing stubs for passlib"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types-passlib-1.7.7.20240106.tar.gz", hash = "sha256:2231ae83d1dd9e485b7ec6041d81b4f9c66403d1767360e860605a90db48ea27"},
+    {file = "types_passlib-1.7.7.20240106-py3-none-any.whl", hash = "sha256:347aa64d4c2bc239f3765fe38fc79dad3d67f9def7b3ea721daaaaa835a91dad"},
+]
+
+[[package]]
 name = "types-pyopenssl"
 version = "24.0.0.20240130"
 description = "Typing stubs for pyOpenSSL"
@@ -1997,4 +2008,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "db711890220bbac09e840a1f21504a091923096dbd2f375ac845a8054e1a139f"
+content-hash = "1e639d32a3647a2dbb85d1215ea1b4b8665c46410c12880b66de73c5ef84215b"

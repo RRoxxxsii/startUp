@@ -14,3 +14,5 @@ REDIS_HOST=redis
 MAIL_USERNAME=yourmail@yandex.ru
 MAIL_PASSWORD=yoursecretpassword
 MAIL_FROM=yourmail@yandex.ru
+
+PROD=1

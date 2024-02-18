@@ -1,32 +1,37 @@
-from redis import Redis        # type: ignore
 from fastapi import FastAPI
+from redis import Redis  # type: ignore
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
-from src.presentation.api.di.database import DBProvider, uow_provider
-from src.presentation.api.di.in_memory_db import RedisProvider, in_memory_provider
-from src.presentation.api.di.mailing import mailing_provider, MailingProvider
+from src.presentation.api.di.providers.main import (
+    RedisProvider,
+    MailingProvider,
+    DBProvider,
+)
+from src.presentation.api.di.providers.common import (
+    in_memory_provider,
+    uow_provider,
+    mailing_provider,
+)
 
 
-def setup_uow(app: FastAPI, pool: async_sessionmaker[AsyncSession]) -> None:
-    provider = DBProvider(pool)
-    app.dependency_overrides[uow_provider] = provider.provide_db  # noqa
+def setup_providers(
+    app: FastAPI,
+    is_production: bool,
+    db_pool: async_sessionmaker[AsyncSession],
+    redis_pool: Redis,
+    mailing_settings,
+):
+    db = DBProvider(db_pool)
+    redis = RedisProvider(redis_pool)
+    mailing = MailingProvider(mailing_settings)
+    app.dependency_overrides[uow_provider] = db.provide_db  # noqa
+    app.dependency_overrides[in_memory_provider] = redis.provide_db  # noqa
 
-
-def setup_mailing(app: FastAPI, settings, prod: bool) -> None:
-    provider = MailingProvider(settings)
-
-    if prod:
-        app.dependency_overrides[
+    if is_production:
+        app.dependency_overrides[  # noqa
             mailing_provider
-        ] = provider.provide_mailing  # noqa
+        ] = mailing.provide_mailing
     else:
-        app.dependency_overrides[
+        app.dependency_overrides[  # noqa
             mailing_provider
-        ] = provider.provide_mailing_debug  # noqa
-
-
-def setup_in_memory_db(app: FastAPI, pool: Redis):
-    provider = RedisProvider(pool)
-    app.dependency_overrides[
-        in_memory_provider
-    ] = provider.provide_db   # noqa
+        ] = mailing.provide_mailing_debug

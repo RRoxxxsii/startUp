@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
 
 from sqlalchemy import select
-
 from src.infrastructure.database.models import UserORM
-from src.infrastructure.database.repositories.base import AbstractRepository, BaseRepository
+from src.infrastructure.database.repositories.base import (
+    AbstractRepository,
+    BaseRepository,
+)
 
 
 class AbstractUserRepository(AbstractRepository, ABC):

@@ -1,1 +1,1 @@
-from .user import UserORM
+from .user import UserORM, TokenORM

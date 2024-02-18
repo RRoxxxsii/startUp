@@ -4,11 +4,11 @@ from datetime import datetime
 from typing import Any
 
 import pytest
-from src.infrastructure.mailing.config import EmailSettings
+from src.infrastructure.mailing.config import SMTPMailConfig
 
 
 @dataclass(frozen=True)
-class FakeEmailSettings(EmailSettings):
+class FakeSMTPMailConfig(SMTPMailConfig):
     MAIL_USERNAME: str = "fake"
     MAIL_PASSWORD: str = "fake"
     MAIL_FROM: str = "fake"

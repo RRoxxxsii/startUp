@@ -1,14 +1,18 @@
-import os
 from dataclasses import dataclass
 from functools import lru_cache
 
+from src.infrastructure.database.config import PostgresConfig
+from src.infrastructure.inmemory_db.config import RedisConfig
+from src.infrastructure.mailing.config import SMTPMailConfig
+from src.infrastructure.tasks.config import CeleryConfig
 
-@dataclass
+
+@dataclass(frozen=True)
 class Settings:
-    PG_DSN: str = os.getenv("PG_DSN")
-
-    CELERY_BROKER_URL: str = os.getenv("CELERY_BROKER_URL")
-    CELERY_RESULT_BACKEND: str = os.getenv("CELERY_RESULT_BACKEND")
+    POSTGRES_DB = PostgresConfig
+    CELERY = CeleryConfig
+    SMTP_MAIL = SMTPMailConfig
+    REDIS = RedisConfig
 
 
 @lru_cache

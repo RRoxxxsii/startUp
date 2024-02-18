@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 
 
 class AbstractInMemoryService(ABC):
-
     def __init__(self, pool):
         self._pool = pool
 
@@ -20,7 +19,6 @@ class AbstractInMemoryService(ABC):
 
 
 class RedisService(AbstractInMemoryService):
-
     def set_value(self, key, value) -> None:
         self._pool.set(key, value)
 
@@ -34,7 +32,7 @@ class RedisService(AbstractInMemoryService):
 class StubInMemoryService(AbstractInMemoryService):
     _storage: dict = {}
 
-    def __init__(self, pool):     # noqa
+    def __init__(self, pool):  # noqa
         self.pool = self._storage
 
     def set_value(self, key, value) -> None:

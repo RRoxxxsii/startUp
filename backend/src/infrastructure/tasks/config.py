@@ -1,6 +1,8 @@
-from celery import Celery
-from src.infrastructure.settings import Settings
+import os
+from dataclasses import dataclass
 
-app = Celery(__name__, broker_connection_retry_on_startup=True)
-app.conf.broker_url = Settings.CELERY_BROKER_URL
-app.conf.result_backend = Settings.CELERY_RESULT_BACKEND
+
+@dataclass(frozen=True)
+class CeleryConfig:
+    CELERY_BROKER_URL: str = os.getenv("CELERY_BROKER_URL")
+    CELERY_RESULT_BACKEND: str = os.getenv("CELERY_RESULT_BACKEND")

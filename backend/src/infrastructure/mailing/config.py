@@ -3,7 +3,7 @@ from dataclasses import asdict, dataclass
 
 
 @dataclass(frozen=True)
-class EmailSettings:
+class SMTPMailConfig:
     MAIL_USERNAME: str = os.getenv("MAIL_USERNAME")
     MAIL_PASSWORD: str = os.getenv("MAIL_PASSWORD")
     MAIL_FROM: str = os.getenv("MAIL_FROM")
