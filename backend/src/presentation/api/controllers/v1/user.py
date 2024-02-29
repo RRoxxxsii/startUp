@@ -32,6 +32,7 @@ from src.presentation.api.controllers.v1.responses.user import (
     TokenCreatedResponse,
     UserOutSchema,
 )
+from src.presentation.api.dependencies.user import get_current_user_or_401
 from src.presentation.api.di.services import get_user_services
 from starlette import status
 from starlette.requests import Request
@@ -111,3 +112,8 @@ async def authenticate(
         return PasswordDoesNotMatchResponse()
     else:
         return TokenCreatedResponse(detail=token)
+
+
+@router.get("/debug/")
+def debug_authenticate(user_id: int = Depends(get_current_user_or_401)):
+    return {"detail": "Success"}

@@ -1,16 +1,15 @@
 from fastapi import FastAPI
 from redis import Redis  # type: ignore
-from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
-
-from src.presentation.api.di.providers.main import (
-    RedisProvider,
-    MailingProvider,
-    DBProvider,
-)
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from src.presentation.api.di.providers.common import (
     in_memory_provider,
-    uow_provider,
     mailing_provider,
+    uow_provider,
+)
+from src.presentation.api.di.providers.main import (
+    DBProvider,
+    MailingProvider,
+    RedisProvider,
 )
 
 

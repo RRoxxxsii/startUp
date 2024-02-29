@@ -32,15 +32,15 @@ class TestCreateUser:
             datetime.datetime.now(),
         )
         mocker.patch(
-            "src.infrastructure.database.repositories.user."
+            "src.infrastructure.database.repositories.user.user."
             "UserRepository.get_user_by_email"  # noqa
         ).return_value = None
         mocker.patch(
-            "src.infrastructure.database.repositories.user."
+            "src.infrastructure.database.repositories.user.user."
             "UserRepository.get_user_by_username"  # noqa
         ).return_value = None
         mocker.patch(
-            "src.infrastructure.database.repositories.token."
+            "src.infrastructure.database.repositories.user.token."
             "TokenRepository.create"
         ).return_value = token_fixture
         mocker.patch(
@@ -73,15 +73,15 @@ class TestCreateUser:
             datetime.datetime.now(),
         )
         mocker.patch(
-            "src.infrastructure.database.repositories.user."
+            "src.infrastructure.database.repositories.user.user."
             "UserRepository.get_user_by_email"  # noqa
         ).return_value = user_fixture
         mocker.patch(
-            "src.infrastructure.database.repositories.token."
+            "src.infrastructure.database.repositories.user.token."
             "TokenRepository.create"
         ).return_value = token_fixture
         mocker.patch(
-            "src.infrastructure.database.repositories.user."
+            "src.infrastructure.database.repositories.user.user."
             "UserRepository.get_user_by_username"  # noqa
         ).return_value = None
 
@@ -104,11 +104,11 @@ class TestCreateUser:
             fake.unique.random_int(), **user_in_data_unique
         )
         mocker.patch(
-            "src.infrastructure.database.repositories.user."
+            "src.infrastructure.database.repositories.user.user."
             "UserRepository.get_user_by_email"  # noqa
         ).return_value = None
         mocker.patch(
-            "src.infrastructure.database.repositories.user."
+            "src.infrastructure.database.repositories.user.user."
             "UserRepository.get_user_by_username"  # noqa
         ).return_value = user_fixture
 
@@ -134,7 +134,7 @@ class TestAuthenticate:
         )
 
         mocker.patch(
-            "src.infrastructure.database.repositories.user."
+            "src.infrastructure.database.repositories.user.user."
             "UserRepository.get_user_by_email"  # noqa
         ).return_value = user
 
@@ -159,7 +159,7 @@ class TestAuthenticate:
         )
 
         mocker.patch(
-            "src.infrastructure.database.repositories.user."
+            "src.infrastructure.database.repositories.user.user."
             "UserRepository.get_user_by_email"  # noqa
         ).return_value = None
 
@@ -177,7 +177,7 @@ class TestAuthenticate:
         dto = AuthDTO(password="RandomPasswordString123", email=user.email)
 
         mocker.patch(
-            "src.infrastructure.database.repositories.user."
+            "src.infrastructure.database.repositories.user.user."
             "UserRepository.get_user_by_email"  # noqa
         ).return_value = user
 

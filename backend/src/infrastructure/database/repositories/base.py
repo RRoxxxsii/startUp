@@ -21,7 +21,7 @@ class AbstractRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_by_id(self, id_: int) -> Model:
+    async def get_by_id(self, id_: int) -> Model | None:
         raise NotImplementedError
 
     @abstractmethod
@@ -50,7 +50,7 @@ class BaseRepository(AbstractRepository):
         await self._session.refresh(obj)
         return obj
 
-    async def get_by_id(self, id_: int) -> Model:
+    async def get_by_id(self, id_: int) -> Model | None:
         stmt = select(self._model).where(self._model.id == id_)
         return (await self._session.execute(stmt)).scalar_one_or_none()
 

@@ -1,4 +1,5 @@
 from fastapi import Depends
+from src.domain.app.usecases.project.usecases import ProjectInteractor
 from src.domain.app.usecases.user.usecases import UserInteractor
 from src.infrastructure.database.uow import AbstractUnitOfWork
 from src.infrastructure.inmemory_db.service import AbstractInMemoryService
@@ -21,3 +22,9 @@ def get_user_services(
     return UserInteractor(
         uow, password_handler, email_service, in_memory_service
     )
+
+
+def get_project_services(
+    uow: AbstractUnitOfWork = Depends(uow_provider),
+) -> ProjectInteractor:
+    return ProjectInteractor(uow)

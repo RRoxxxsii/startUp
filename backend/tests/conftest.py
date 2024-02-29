@@ -3,9 +3,11 @@ from collections.abc import AsyncGenerator
 from typing import Any
 
 import faker
+import pytest
 import pytest_asyncio
 from fastapi import FastAPI
 from httpx import AsyncClient
+from redis import Redis  # type: ignore
 from sqlalchemy import text
 from sqlalchemy.orm import close_all_sessions, sessionmaker
 from src.infrastructure.database.main import (
@@ -51,7 +53,14 @@ async def db_session_test() -> sessionmaker:
 
 @pytest_asyncio.fixture(scope="function", autouse=True)
 async def clean_tables(db_session_test) -> None:
-    tables = ("users",)
+    tables = (
+        "users",
+        "tokens",
+        "users_projects",
+        "categories",
+        "resources",
+        "projects",
+    )
     async with db_session_test() as session:
         for table in tables:
             stmt = text(f"""TRUNCATE TABLE {table} CASCADE;""")
@@ -65,6 +74,21 @@ async def api_client() -> AsyncGenerator[AsyncClient, Any]:
         app=create_test_app(), base_url="http://test"
     ) as client:
         yield client
+
+
+@pytest.fixture
+def redis_pool() -> Redis:
+    return init_redis_pool(host=os.getenv("REDIS_HOST"))
+
+
+@pytest.fixture(scope="function", autouse=True)
+def clean_redis(redis_pool) -> None:
+    redis_pool.flushdb()
+
+
+@pytest.fixture
+def mock_redis_pool() -> dict:
+    return {}
 
 
 fake = faker.Faker()

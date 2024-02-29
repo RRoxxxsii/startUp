@@ -1,10 +1,12 @@
-from redis import Redis    # type: ignore
-from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
-
+from redis import Redis  # type: ignore
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from src.infrastructure.database.uow import UnitOfWork
 from src.infrastructure.inmemory_db.service import RedisService
 from src.infrastructure.mailing.config import SMTPMailConfig
-from src.infrastructure.mailing.services import SMTPLibEmailService, DebugEmailService
+from src.infrastructure.mailing.services import (
+    DebugEmailService,
+    SMTPLibEmailService,
+)
 
 
 class MailingProvider:

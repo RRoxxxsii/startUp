@@ -1,4 +1,4 @@
-from redis import Redis   # type: ignore
+from redis import Redis  # type: ignore
 
 
 def init_redis_pool(host: str) -> Redis:

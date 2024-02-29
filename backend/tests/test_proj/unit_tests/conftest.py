@@ -38,6 +38,21 @@ class MockToken:
     time_created: datetime
 
 
+@dataclass(frozen=True)
+class MockCategory:
+    id: int
+    title: str
+    description: str
+
+
+@dataclass(frozen=True)
+class MockProject:
+    id: int
+    title: str
+    description: str
+    status: str
+
+
 @pytest.fixture
 def create_mock_user() -> Callable[[int, str, str, str, str, str], MockUser]:
     def wrapper(
@@ -60,5 +75,23 @@ def create_mock_token() -> Callable[[int, str, Any], MockToken]:
     def wrapper(pk: int, access_token: str, time_created):
         mock_token = MockToken(pk, access_token, time_created)
         return mock_token
+
+    return wrapper
+
+
+@pytest.fixture
+def create_mock_category() -> Callable[[int, str, Any], MockCategory]:
+    def wrapper(pk: int, title: str, description: str):
+        mock_category = MockCategory(pk, title, description)
+        return mock_category
+
+    return wrapper
+
+
+@pytest.fixture
+def create_mock_project() -> Callable[[int, str, str, str], MockProject]:
+    def wrapper(pk: int, title: str, description: str, status: str):
+        mock_project = MockProject(pk, title, description, status)
+        return mock_project
 
     return wrapper

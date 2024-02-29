@@ -17,6 +17,10 @@ class AbstractInMemoryService(ABC):
     def delete_value(self, key) -> None:
         raise NotImplementedError
 
+    @abstractmethod
+    def get_key(self, value) -> str | None:
+        raise NotImplementedError
+
 
 class RedisService(AbstractInMemoryService):
     def set_value(self, key, value) -> None:
@@ -24,6 +28,11 @@ class RedisService(AbstractInMemoryService):
 
     def get_value(self, key) -> str | list | dict | int:
         return self._pool.get(key)
+
+    def get_key(self, value) -> str | None:  # type: ignore
+        for key in self._pool.scan_iter():
+            if self._pool.get(key) == value:
+                return key
 
     def delete_value(self, key) -> None:
         self._pool.delete(key)
@@ -40,6 +49,11 @@ class StubInMemoryService(AbstractInMemoryService):
 
     def get_value(self, key) -> str | list | dict | int:
         return self.pool.get(key)
+
+    def get_key(self, value) -> str | None:  # type: ignore
+        for key in self._pool.keys():
+            if self._pool.get(key) == value:
+                return key
 
     def delete_value(self, key) -> None:
         del self.pool[key]

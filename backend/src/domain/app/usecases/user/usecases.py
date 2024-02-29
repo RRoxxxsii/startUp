@@ -35,65 +35,69 @@ class CreateUser(CreateUserUseCase):
     async def execute(
         self, user_dto: CreateUserDTO, urlpath_dto: UrlPathDTO
     ) -> UserORM | None:
-        async with self.uow:
-            if await self.uow.user_repo.get_user_by_email(user_dto.email):
-                raise UserExists("User with this email already exists")
-            elif await self.uow.user_repo.get_user_by_username(
-                user_dto.username
-            ):
-                raise UserExists("User with this username already exists")
-            user_dto_dict = user_dto.dict()
-            user_dto_dict.pop("password")
-            user: UserORM = await self.uow.user_repo.create(
-                hashed_password=self.pwd_service.hash_password(
-                    user_dto.password
-                ),
-                **user_dto_dict,
-            )
-            token: TokenORM = await self.uow.token_repo.create(
-                user_id=user.id, access_token=str(uuid.uuid4())
-            )
-            await self.uow.commit()
-            urlpath_dto.path += token.access_token
-            self._send_email(to_email=user_dto.email, urlpath_dto=urlpath_dto)
-            return user
+        if await self.uow.user_repo.get_user_by_email(user_dto.email):
+            await self.uow.rollback()
+            raise UserExists("User with this email already exists")
+
+        elif await self.uow.user_repo.get_user_by_username(user_dto.username):
+            await self.uow.rollback()
+            raise UserExists("User with this username already exists")
+
+        user_dto_dict = user_dto.dict()
+        user_dto_dict.pop("password")
+        user: UserORM = await self.uow.user_repo.create(
+            hashed_password=self.pwd_service.hash_password(user_dto.password),
+            **user_dto_dict,
+        )
+        token: TokenORM = await self.uow.token_repo.create(
+            user_id=user.id, access_token=str(uuid.uuid4())
+        )
+        await self.uow.commit()
+        urlpath_dto.path += token.access_token
+        self._send_email(to_email=user_dto.email, urlpath_dto=urlpath_dto)
+        return user
 
 
 class ConfirmEmail(BaseUseCase):
     async def execute(self, token: str) -> None:
-        async with self.uow:
-            token = await self.uow.token_repo.get_token_by_uuid(token)
-            if not token:
-                raise TokenDoesNotExist("This token does not exist")
-            await self.uow.user_repo.update_obj(token.user_id, is_active=True)
-            await self.uow.commit()
+        token = await self.uow.token_repo.get_token_by_uuid(token)
+        if not token:
+            await self.uow.rollback()
+            raise TokenDoesNotExist("This token does not exist")
+        await self.uow.user_repo.update_obj(token.user_id, is_active=True)
+        await self.uow.commit()
 
 
 class AuthUser(AuthUserUseCase):
     async def execute(self, dto: AuthDTO) -> str:
-        async with self.uow:
-            user = await self.uow.user_repo.get_user_by_email(dto.email)
+        user = await self.uow.user_repo.get_user_by_email(dto.email)
 
-            if not user:
-                raise UserDoesNotExist(
-                    "User with provided email does not exist"
-                )
+        if not user:
+            await self.uow.rollback()
+            raise UserDoesNotExist("User with provided email does not exist")
 
-            if not self.pwd_service.check_password(
-                password=dto.password, hashed_password=user.hashed_password
-            ):
-                raise PasswordDoesNotMatch(
-                    "Email does not appear to match the password"
-                )
-
-            if self.in_memory_service.get_value(f"user:{user.id}"):
-                self.in_memory_service.delete_value(f"user:{user.id}")
-
-            token = str(uuid.uuid4())
-            self.in_memory_service.set_value(
-                key=f"user:{user.id}", value=token
+        if not self.pwd_service.check_password(
+            password=dto.password, hashed_password=user.hashed_password
+        ):
+            await self.uow.rollback()
+            raise PasswordDoesNotMatch(
+                "Email does not appear to match the password"
             )
-            return token
+
+        if self.in_memory_service.get_value(f"user:{user.id}"):
+            self.in_memory_service.delete_value(f"user:{user.id}")
+
+        token = str(uuid.uuid4())
+        self.in_memory_service.set_value(key=f"user:{user.id}", value=token)
+        await self.uow.commit()
+        return token
+
+
+class GetCurrentUserID(AuthUserUseCase):
+    async def execute(self, token: str) -> int | None:  # type: ignore
+        if user_key := self.in_memory_service.get_key(value=token):
+            await self.uow.commit()
+            return int(user_key.split(":")[-1])
 
 
 class UserInteractor:
@@ -123,3 +127,8 @@ class UserInteractor:
         return await AuthUser(
             self.uow, self.pwd_service, self.in_memory_service
         ).execute(dto)
+
+    async def get_current_user_id_or_none(self, token: str) -> int | None:
+        return await GetCurrentUserID(
+            self.uow, self.pwd_service, self.in_memory_service
+        ).execute(token)

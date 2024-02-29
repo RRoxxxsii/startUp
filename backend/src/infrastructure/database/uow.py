@@ -1,12 +1,14 @@
 from abc import abstractmethod
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.infrastructure.database.repositories.token import (
+from src.infrastructure.database.repositories import (
+    AbstractCategoryRepository,
+    AbstractProjectRepository,
     AbstractTokenRepository,
-    TokenRepository,
-)
-from src.infrastructure.database.repositories.user import (
     AbstractUserRepository,
+    CategoryRepository,
+    ProjectRepository,
+    TokenRepository,
     UserRepository,
 )
 
@@ -14,12 +16,8 @@ from src.infrastructure.database.repositories.user import (
 class AbstractUnitOfWork:
     token_repo: AbstractTokenRepository
     user_repo: AbstractUserRepository
-
-    async def __aenter__(self):
-        return self
-
-    async def __aexit__(self, exc_type, exc_value, traceback):
-        await self.rollback()
+    project_repo: AbstractProjectRepository
+    category_repo: AbstractCategoryRepository
 
     @abstractmethod
     async def commit(self):
@@ -34,10 +32,10 @@ class UnitOfWork(AbstractUnitOfWork):
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
-    async def __aenter__(self):
         self.user_repo = UserRepository(self._session)
         self.token_repo = TokenRepository(self._session)
-        return super().__aenter__()
+        self.project_repo = ProjectRepository(self._session)
+        self.category_repo = CategoryRepository(self._session)
 
     async def commit(self):
         await self._session.commit()
