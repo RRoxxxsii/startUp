@@ -45,3 +45,16 @@ async def create_project(
             category=category,
             user=user
         )
+
+
+def update_project_with_resources():
+    raise NotImplementedError
+
+
+def add_users_to_project():
+    raise NotImplementedError
+
+
+def update_project_description():
+    raise NotImplementedError
+

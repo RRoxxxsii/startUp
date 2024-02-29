@@ -3,4 +3,4 @@ from pydantic import BaseModel
 
 class CreateProjectSchema(BaseModel):
     title: str
-    description: str
+    description: str | None = None

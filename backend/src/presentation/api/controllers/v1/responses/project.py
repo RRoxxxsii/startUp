@@ -15,6 +15,6 @@ class ProjectOutSchema(BaseModel):
     id: int
     status: Enum
     title: str
-    description: str
     category: CategoryOutSchema
     user: UserOutSchema
+    description: str | None = None
